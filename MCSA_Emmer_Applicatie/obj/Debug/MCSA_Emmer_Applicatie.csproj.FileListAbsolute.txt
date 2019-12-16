@@ -1,0 +1,7 @@
+D:\MSI_BU\ITVitae\MCSD_70_483\Exam Ref Excercise\MCSA_Emmer_Applicatie\MCSA_Emmer_Applicatie\bin\Debug\MCSA_Emmer_Applicatie.exe.config
+D:\MSI_BU\ITVitae\MCSD_70_483\Exam Ref Excercise\MCSA_Emmer_Applicatie\MCSA_Emmer_Applicatie\bin\Debug\MCSA_Emmer_Applicatie.exe
+D:\MSI_BU\ITVitae\MCSD_70_483\Exam Ref Excercise\MCSA_Emmer_Applicatie\MCSA_Emmer_Applicatie\bin\Debug\MCSA_Emmer_Applicatie.pdb
+D:\MSI_BU\ITVitae\MCSD_70_483\Exam Ref Excercise\MCSA_Emmer_Applicatie\MCSA_Emmer_Applicatie\obj\Debug\MCSA_Emmer_Applicatie.csproj.CoreCompileInputs.cache
+D:\MSI_BU\ITVitae\MCSD_70_483\Exam Ref Excercise\MCSA_Emmer_Applicatie\MCSA_Emmer_Applicatie\obj\Debug\MCSA_Emmer_Applicatie.exe
+D:\MSI_BU\ITVitae\MCSD_70_483\Exam Ref Excercise\MCSA_Emmer_Applicatie\MCSA_Emmer_Applicatie\obj\Debug\MCSA_Emmer_Applicatie.pdb
+D:\MSI_BU\ITVitae\MCSD_70_483\Exam Ref Excercise\MCSA_Emmer_Applicatie\MCSA_Emmer_Applicatie\obj\Debug\MCSA_Emmer_Applicatie.csprojAssemblyReference.cache

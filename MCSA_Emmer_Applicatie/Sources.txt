@@ -1,0 +1,2 @@
+https://www.dotnetperls.com/random
+https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/conditional-operator
