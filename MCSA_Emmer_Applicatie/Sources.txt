@@ -1,2 +1,9 @@
 https://www.dotnetperls.com/random
 https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/conditional-operator
+https://www.codeproject.com/Tips/532831/Use-of-Is-and-As-operators-in-Csharp
+https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads
+https://www.dotnetperls.com/switch-enum
+https://stackoverflow.com/questions/20147879/switch-case-can-i-use-a-range-instead-of-a-one-number
+https://johnthiriet.com/cancel-asynchronous-operation-in-csharp/
+https://stackoverflow.com/questions/13159080/how-does-taskint-become-an-int
+https://stackoverflow.com/questions/6989647/console-readkey-and-switch-statement-using-letters

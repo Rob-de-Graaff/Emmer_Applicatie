@@ -1,1 +1,3 @@
 https://www.dotnetperls.com/random
+https://codereview.stackexchange.com/questions/48174/having-children-call-parents-public-events-with-data-generated-from-a-protected
+https://www.codeproject.com/Articles/5249/How-to-override-parent-class-event-method-with-you

@@ -1,41 +1,54 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MCSA_Emmer_Applicatie
 {
     public abstract class Container
     {
-        protected int content;
-        protected int contentMin;
-        protected int contentCurrent;
-
-        public int Content { get; set; }
-        public int ContentMin { get; protected set; }
+        public int Content { get; protected set; }
         public int ContentCurrent { get; set; }
 
         public Container()
         {
         }
 
-        public Container(int content, int contentMin, int contentCurrent)
+        public Container(int content, int contentCurrent)
         {
-            this.Content = content;
-            this.ContentMin = contentMin;
-            this.ContentCurrent = contentCurrent;
+            Content = content;
+            ContentCurrent = contentCurrent;
         }
 
-        public abstract int FillBucket(int input, bool warning);
+        public abstract Task<int> FillContainer(int input, CancellationToken cancellationToken);
 
-        public abstract int EmptyBucket(int input, int currentContent, bool partially);
+        public abstract bool CheckContainerIfFull();
 
-        public event EventHandler BucketFilled;
+        public abstract int EmptyContainer(int input);
 
-        protected virtual void OnBucketFilled()
+        public abstract bool CheckContainerIfEmpty();
+
+        public abstract override string ToString();
+
+        public delegate void ContainerEventHandler(object sender, ContainerEventArgs e);
+        public event ContainerEventHandler ContainerFilled;
+        public event ContainerEventHandler ContainerOverflow;
+
+        public virtual void OnContainerFilled(int over)
         {
-            // BucketFilled?.Invoke(this, new EventArgs());
-            if (BucketFilled != null)
-            {
-                BucketFilled(this, new EventArgs());
-            }
+            #region Example code
+            //if (onContainerFilled != null)
+            //{
+            //    onContainerFilled(this, new ContainerEventArgs());
+            //}
+            #endregion
+
+            //does not invoke ContainerEventArgs() default constructor
+            ContainerFilled?.Invoke(this, new ContainerEventArgs(over));
+        }
+
+        public virtual void OnContainerOverflow(int over)
+        {
+            ContainerOverflow?.Invoke(this, new ContainerEventArgs(over));
         }
     }
 }

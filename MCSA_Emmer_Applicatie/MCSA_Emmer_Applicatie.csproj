@@ -45,8 +45,12 @@
   <ItemGroup>
     <Compile Include="Bucket.cs" />
     <Compile Include="Container.cs" />
+    <Compile Include="ContainerEventArgs.cs" />
+    <Compile Include="Oil_barrel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rain_barrel.cs" />
+    <Compile Include="Scenario.cs" />
     <Compile Include="Storage.cs" />
   </ItemGroup>
   <ItemGroup>
