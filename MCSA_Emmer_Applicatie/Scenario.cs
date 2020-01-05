@@ -25,7 +25,7 @@ namespace MCSA_Emmer_Applicatie
             // bucket 2 Listens for containerOverflow event
             bucket2.ContainerOverflow += OnContainerOverflow;
             Console.WriteLine(bucket2.ToString());
-            bucket1.TransferBucketContent(8, bucket1, bucket2).Wait();
+            bucket1.TransferBucketContent(8, bucket1, bucket2);
         }
 
         private void ScenarioTwo()

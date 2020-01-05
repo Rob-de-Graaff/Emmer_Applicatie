@@ -7,3 +7,8 @@ https://stackoverflow.com/questions/20147879/switch-case-can-i-use-a-range-inste
 https://johnthiriet.com/cancel-asynchronous-operation-in-csharp/
 https://stackoverflow.com/questions/13159080/how-does-taskint-become-an-int
 https://stackoverflow.com/questions/6989647/console-readkey-and-switch-statement-using-letters
+https://www.dotnetperls.com/async
+https://www.c-sharpcorner.com/article/async-and-await-in-c-sharp/
+https://www.codeproject.com/Questions/1243163/Csharp-how-to-cancle-task-run-by-click-on-another
+https://www.c-sharpcorner.com/article/cancelling-long-running-task-using-cancellationtokensource-in-net/
+https://stackoverflow.com/questions/4783865/how-do-i-abort-cancel-tpl-tasks

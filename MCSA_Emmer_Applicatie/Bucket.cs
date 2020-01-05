@@ -59,49 +59,51 @@ namespace MCSA_Emmer_Applicatie
             {
                 int result = 0;
 
-                if (!cancellationToken.IsCancellationRequested)
+
+                if (input > 0)
                 {
-                    if (input > 0)
+                    for (int i = 0; i < input; i++)
                     {
-                        for (int i = 0; i < input; i++)
+                        // listens for cancelation token
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        // Check if a cancellation is requested, if yes,
+                        // throw a TaskCanceledException.
+                        //if (cancellationToken.IsCancellationRequested)
+                        //    throw new TaskCanceledException(task);
+
+                        if (CheckContainerIfFull())
                         {
-                            if (CheckContainerIfFull())
-                            {
-                                // Raises Filled event
-                                // TODO: Check why event is not raised
-                                OnContainerFilled(0);
+                            // Raises Filled event
+                            // TODO: Check why event is not raised
+                            OnContainerFilled(0);
 
-                                result = input - i;
-                                if (result >= 1)
-                                {
-                                    // Raises overflow event
-                                    OnContainerOverflow(result);
-
-                                    //Console.WriteLine($"this bucket will overflow, do you wish to continue? Y/N");
-                                    //var tempKey = Console.ReadKey();
-                                    //switch (tempKey.Key)
-                                    //{
-                                    //    case ConsoleKey.Y:
-                                    //        // Cancel the task
-                                    //        //cancellationToken.Cancel();
-                                    //        //if (cancellationToken.IsCancellationRequested)
-                                    //        //{ throw new TaskCanceledException(task); }
-                                    //        break;
-                                    //    default:
-                                    //        break;
-                                    //}
-                                }
-                            }
-                            else
+                            result = input - i;
+                            if (result >= 1)
                             {
-                                ContentCurrent++;
+                                // Raises overflow event
+                                OnContainerOverflow(result);
+
+                                //Console.WriteLine($"this bucket will overflow, do you wish to continue? Y/N");
+                                //var tempKey = Console.ReadKey();
+                                //switch (tempKey.Key)
+                                //{
+                                //    case ConsoleKey.Y:
+                                //        // Cancel the task
+                                //        cancellationToken.Cancel();
+                                //        //if (cancellationToken.IsCancellationRequested)
+                                //        //{ throw new TaskCanceledException(task); }
+                                //        break;
+                                //    default:
+                                //        break;
+                                //}
                             }
                         }
+                        else
+                        {
+                            ContentCurrent++;
+                        }
                     }
-                }
-                else
-                {
-                    throw new TaskCanceledException(task);
                 }
 
                 return result;
@@ -130,7 +132,7 @@ namespace MCSA_Emmer_Applicatie
             return result;
         }
         
-        public async Task TransferBucketContent(int input, Container containerIn, Container containerOut)
+        public async void TransferBucketContent(int input, Container containerIn, Container containerOut)
         {
             if (containerIn is Bucket && containerOut is Bucket)
             {
@@ -156,9 +158,11 @@ namespace MCSA_Emmer_Applicatie
                     {
                         int TranferAmount = containerIn.EmptyContainer(input);
                         // FillContainer method runs asynchronously.
-                        containerIn.ContentCurrent += await containerOut.FillContainer(TranferAmount, cancellationTokenSource.Token);
+                        var FillTask = containerOut.FillContainer(TranferAmount, cancellationTokenSource.Token);
+                        // TODO: Check why filltask does not return from overflow eventhandler to keyBoardTask
+                        containerIn.ContentCurrent += await FillTask;
                     }
-                    catch (TaskCanceledException)
+                    catch (OperationCanceledException)
                     {
                         Console.WriteLine("Task was cancelled");
                         
