@@ -8,10 +8,6 @@ namespace MCSA_Emmer_Applicatie
 {
     public class ContainerEventArgs : EventArgs
     {
-        //public ContainerEventArgs()
-        //{
-        //}
-
         public ContainerEventArgs(int over)
         {
             Overflow = over;

@@ -6,97 +6,98 @@ namespace MCSA_Emmer_Applicatie
 {
     public class Bucket : Container
     {
+        #region fields/ properties
         public int ContentMin { get; private set; }
         public bool FullWarning { get; private set; }
-        public bool PartiallyEmptied { get; private set; }
+        public bool OverflowWarning { get; private set; }
+        public bool OverflowStop { get; private set; }
         private const int ContentMinValue = 10;
         private const int ContentDefault = 12;
+        #endregion
 
-        public Bucket()
-        {
-            Content = ContentDefault;
-            ContentMin = ContentMinValue;
-            ContentCurrent = 0;
-            FullWarning = false;
-            PartiallyEmptied = false;
-        }
+        #region Constructors
+        public Bucket() : this(ContentDefault, 0, false, false, false) { }
 
-        public Bucket(int content, int contentCurrent, bool fullWarning, bool partiallyEmptied, int contentMin = ContentMinValue) : base(content, contentCurrent)
+        public Bucket(int content, int contentCurrent, bool fullWarning, bool overflowWarning, bool overflowStop) : base(content, contentCurrent)
         {
-            Content = content;
-            ContentMin = contentMin;
+            if (content >= ContentMinValue)
+            {
+                Content = content;
+            }
+            else
+            {
+                Content = ContentMinValue;
+            }
             ContentCurrent = contentCurrent;
             FullWarning = fullWarning;
-            PartiallyEmptied = partiallyEmptied;
+            OverflowWarning = overflowWarning;
+            OverflowStop = overflowStop;
+
+            // every bucket Listens for containerfull event
+            ContainerFilled += (sender, e) => OnContainerFilled(sender, e);
+            // every bucket Listens for containerOverflow event
+            ContainerOverflow += (sender, e) => ContainerOverflowHandler(e);
         }
+        #endregion
+
+        #region Methods
 
         public override int EmptyContainer(int input)
         {
             int result = input;
             int MinVal = ContentCurrent - input;
 
-            if (PartiallyEmptied && input <= ContentCurrent && input > 0)
+            if (input > 0)
             {
-                while (input >= MinVal && !CheckContainerIfEmpty())
+                if (input <= ContentCurrent)
                 {
-                    ContentCurrent--;
-                    input--;
+                    while (input >= MinVal && !CheckContainerIfEmpty())
+                    {
+                        ContentCurrent--;
+                        input--;
+                    }
+                }
+                else
+                {
+                    // example input = 2 currentcontent = 1. 1-2=-1
+                    //result = ContentCurrent;
+                    result = 0;
+                    Console.WriteLine($"Input: {input} is not allowed, it exceeds the content");
                 }
             }
             else
             {
-                // example input = 2 currentcontent = 1. 1-2=-1
-                result = ContentCurrent;
+                result = 0;
+                Console.WriteLine($"Input: {input} is not allowed, only positive digits");
             }
             return result;
         }
 
-        public override Task<int> FillContainer(int input, CancellationToken cancellationToken)
+        public override Task<int> FillContainer(int input)
         {
-            Task<int> task = null;
-
-            task = Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 int result = 0;
-
 
                 if (input > 0)
                 {
                     for (int i = 0; i < input; i++)
                     {
-                        // listens for cancelation token
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        // Check if a cancellation is requested, if yes,
-                        // throw a TaskCanceledException.
-                        //if (cancellationToken.IsCancellationRequested)
-                        //    throw new TaskCanceledException(task);
-
                         if (CheckContainerIfFull())
                         {
                             // Raises Filled event
-                            // TODO: Check why event is not raised
                             OnContainerFilled(0);
 
                             result = input - i;
-                            if (result >= 1)
+                            if (result >= 1 && OverflowWarning)
                             {
                                 // Raises overflow event
                                 OnContainerOverflow(result);
 
-                                //Console.WriteLine($"this bucket will overflow, do you wish to continue? Y/N");
-                                //var tempKey = Console.ReadKey();
-                                //switch (tempKey.Key)
-                                //{
-                                //    case ConsoleKey.Y:
-                                //        // Cancel the task
-                                //        cancellationToken.Cancel();
-                                //        //if (cancellationToken.IsCancellationRequested)
-                                //        //{ throw new TaskCanceledException(task); }
-                                //        break;
-                                //    default:
-                                //        break;
-                                //}
+                                if (OverflowStop)
+                                {
+                                    break;
+                                }
                             }
                         }
                         else
@@ -105,21 +106,18 @@ namespace MCSA_Emmer_Applicatie
                         }
                     }
                 }
-
+                else
+                {
+                    Console.WriteLine($"Input: {input} is not allowed, only positive digits");
+                }
                 return result;
             });
-
             return task;
         }
 
         public override bool CheckContainerIfFull()
         {
-            bool result = false;
-            if (ContentCurrent == Content && FullWarning)
-            {
-                result = true;
-            }
-            return result;
+            return (ContentCurrent == Content);
         }
 
         public override bool CheckContainerIfEmpty()
@@ -131,45 +129,54 @@ namespace MCSA_Emmer_Applicatie
             }
             return result;
         }
-        
-        public async void TransferBucketContent(int input, Container containerIn, Container containerOut)
+
+        public async void TransferBucketContent(int input, Container containerOut)
         {
-            if (containerIn is Bucket && containerOut is Bucket)
+            var containerTypeOut = this as Bucket;
+            var containerTypeIn = containerOut as Bucket;
+            if (containerTypeOut != null && containerTypeIn != null)
             {
-                using (var cancellationTokenSource = new CancellationTokenSource())
+                int TranferAmount = EmptyContainer(input);
+                if (TranferAmount > 0)
                 {
-                    // TODO: Check why keyBoardTask is skipped (example: AsyncTips)
-                    var keyBoardTask = Task.Run(() =>
-                    {
-                        Console.WriteLine($"this bucket will overflow, do you wish to continue? Y/N");
-                        var tempkey = Console.ReadKey();
-                        switch (tempkey.Key)
-                        {
-                            case ConsoleKey.Y:
-                                // Cancel the task
-                                cancellationTokenSource.Cancel();
-                                break;
-                            default:
-                                break;
-                        }
-                    });
-
-                    try
-                    {
-                        int TranferAmount = containerIn.EmptyContainer(input);
-                        // FillContainer method runs asynchronously.
-                        var FillTask = containerOut.FillContainer(TranferAmount, cancellationTokenSource.Token);
-                        // TODO: Check why filltask does not return from overflow eventhandler to keyBoardTask
-                        containerIn.ContentCurrent += await FillTask;
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        Console.WriteLine("Task was cancelled");
-                        
-                    }
-
-                    await keyBoardTask;
+                    ShowLeftoverContent(input, containerOut);
+                    // FillContainer method runs asynchronously.
+                    var FillTask = containerOut.FillContainer(TranferAmount);
+                    ContentCurrent += await FillTask;
                 }
+                else
+                {
+                    Console.WriteLine($"Transferring bucket content failed");
+                }
+                #region Example code
+                //try
+                //{
+                //    int TranferAmount = EmptyContainer(input);
+                //    ShowLeftoverContent(input, containerOut);
+                //    // FillContainer method runs asynchronously.
+                //    var FillTask = containerOut.FillContainer(TranferAmount);
+                //    ContentCurrent += await FillTask;
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine(ex.Message);
+                //    //Console.WriteLine("Task was cancelled");
+                //}
+                #endregion
+            }
+            else
+            {
+                Console.WriteLine($"this container is not a bucket but a {GetType().Name}/{containerOut.GetType().Name}");
+            }
+        }
+
+        public void ShowLeftoverContent(int input, Container containerOut)
+        {
+            int result = 0;
+            if (input + containerOut.ContentCurrent > containerOut.Content)
+            {
+                result = containerOut.Content - containerOut.ContentCurrent;
+                Console.WriteLine($"the bucket may overflow, please pour {result}L to prevent this from happening");
             }
         }
 
@@ -177,5 +184,22 @@ namespace MCSA_Emmer_Applicatie
         {
             return $"size:{Content}, Content:{ContentCurrent}, min:{ContentMin}";
         }
+
+        public void OnContainerFilled(object sender, ContainerEventArgs e)
+        {
+            if (FullWarning)
+            {
+                Console.WriteLine($"bucket is full");
+            }
+        }
+
+        public void ContainerOverflowHandler(ContainerEventArgs e)
+        {
+            if (OverflowWarning)
+            {
+                Console.WriteLine($"bucket is overflowing {e.Overflow}L");
+            }
+        }
+        #endregion
     }
 }

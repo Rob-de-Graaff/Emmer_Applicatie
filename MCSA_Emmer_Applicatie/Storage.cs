@@ -27,7 +27,7 @@ namespace MCSA_Emmer_Applicatie
                     int Content = GetRandomNumber(minContent, maxContent);
                     int ContentMin = minContent;
                     int ContentCurrent = GetRandomNumber(minContent, Content);
-                    container = new Bucket(Content, ContentMin, true, true, ContentCurrent);
+                    container = new Bucket(Content, ContentMin, true, true, true);
                 }
                 containerList.Add(container);
                 //bucketList.Add((Bucket)container);

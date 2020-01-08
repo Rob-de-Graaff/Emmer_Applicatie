@@ -9,36 +9,50 @@ namespace MCSA_Emmer_Applicatie
 {
     class Oil_barrel : Container
     {
+        #region Fields
         private const int ContentValue = 159;
+        #endregion
 
+        #region Constructors
         public Oil_barrel()
         {
             Content = ContentValue;
             ContentCurrent = 0;
         }
 
-        public Oil_barrel(int content, int contentCurrent) : base(content, contentCurrent)
+        public Oil_barrel(int contentCurrent) : base(ContentValue, contentCurrent)
         {
             Content = ContentValue;
             ContentCurrent = contentCurrent;
         }
+        #endregion
 
+        #region Methods
         public override int EmptyContainer(int input)
         {
             int result = input;
             int MinVal = ContentCurrent - input;
 
-            if (input <= ContentCurrent && input > 0)
+            if (input > 0)
             {
-                while (input >= MinVal && !CheckContainerIfEmpty())
+                if (input <= ContentCurrent)
                 {
-                    ContentCurrent--;
-                    input--;
+                    while (input >= MinVal && !CheckContainerIfEmpty())
+                    {
+                        ContentCurrent--;
+                        input--;
+                    }
+                }
+                else
+                {
+                    result = 0;
+                    Console.WriteLine($"Input: {input} is not allowed, it exceeds the content");
                 }
             }
             else
             {
-                result = ContentCurrent;
+                result = 0;
+                Console.WriteLine($"Input: {input} is not allowed, only positive digits");
             }
             return result;
         }
@@ -53,11 +67,9 @@ namespace MCSA_Emmer_Applicatie
             return result;
         }
 
-        public override Task<int> FillContainer(int input, CancellationToken cancellationToken)
+        public override Task<int> FillContainer(int input)
         {
-            Task<int> task = null;
-
-            task = Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 int result = 0;
 
@@ -67,12 +79,21 @@ namespace MCSA_Emmer_Applicatie
                     {
                         if (CheckContainerIfFull())
                         {
-                            // error Container class
+                            // Raises Filled event
                             OnContainerFilled(0);
+
                             result = input - i;
                             if (result >= 1)
                             {
+                                // Raises overflow event
                                 OnContainerOverflow(result);
+                                break;
+                                #region Example code
+                                //if (OverflowStop)
+                                //{
+                                //    break;
+                                //}
+                                #endregion
                             }
                         }
                         else
@@ -81,10 +102,12 @@ namespace MCSA_Emmer_Applicatie
                         }
                     }
                 }
-
+                else
+                {
+                    Console.WriteLine($"Input: {input} is not allowed, only positive digits");
+                }
                 return result;
             });
-
             return task;
         }
 
@@ -102,5 +125,6 @@ namespace MCSA_Emmer_Applicatie
         {
             return $"size:{Content}, Content:{ContentCurrent}, fixed size:{ContentValue}";
         }
+        #endregion
     }
 }
